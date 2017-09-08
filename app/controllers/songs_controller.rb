@@ -1,14 +1,16 @@
 class SongsController < ApplicationController
   def index
+    p = Preference.first
+    
     if params[:artist_id]
       @artist = Artist.find_by(id: params[:artist_id])
       if @artist.nil?
         redirect_to artists_path, alert: "Artist not found"
       else
-        @songs = @artist.songs
+        @songs = @artist.songs.order("name #{p.song_sort_order}")
       end
     else
-      @songs = Song.all
+      @songs = Song.all.order("name #{p.song_sort_order}")
     end
   end
 
@@ -29,7 +31,7 @@ class SongsController < ApplicationController
     if p.allow_create_songs
       @song = Song.new
     else
-      redirect_to songs_path
+      redirect_to songs_path, alert: "You do not have permissions to create a Song!"
     end
   end
 
